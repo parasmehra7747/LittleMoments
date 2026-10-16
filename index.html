@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Moments ♡</title>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- LZString for compact compression -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+
+    <style>
+        :root {
+          --pink: #f8dce7;
+          --rose: #c75b83;
+          --rose-dark: #a84166;
+          --dark: #71384f;
+          --cream: #fffaf5;
+          --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+          margin: 0;
+          font-family: Georgia, "Times New Roman", serif;
+          background: linear-gradient(135deg, #fff5f6, #fce5ed, #fff4e9);
+          color: var(--dark);
+          min-height: 100vh;
+          position: relative;
+          overflow-x: hidden;
+        }
+
+        button, input, textarea, select { font: inherit; }
+
+        button {
+          cursor: pointer;
+          border: none;
+          border-radius: 24px;
+          padding: 11px 20px;
+          background: var(--rose);
+          color: white;
+          transition: all .25s ease;
+          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+        }
+
+        button:hover {
+          background: var(--rose-dark);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(199, 91, 131, 0.28);
+        }
+
+        button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .secondary {
+          background: white;
+          color: var(--rose);
+          border: 1px solid #efc2d2;
+        }
+
+        .secondary:hover {
+          background: #fff3f7;
+          color: var(--rose-dark);
+        }
+
+        .whatsapp-btn {
+          background: #25D366;
+          color: white;
+        }
+        .whatsapp-btn:hover {
+          background: #1eb956;
+          box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+        }
+
+        header {
+          text-align: center;
+          padding: 35px 16px 15px;
+        }
+
+        header h1 {
+          font-size: clamp(32px, 6vw, 54px);
+          margin: 8px;
+          color: var(--rose);
+          font-style: italic;
+        }
+
+        header p {
+          font-size: 17px;
+          color: #8c5369;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .heart {
+          color: #e77c9f;
+          animation: beat 1.5s infinite;
+          display: inline-block;
+        }
+
+        @keyframes beat {
+          50% { transform: scale(1.2); }
+        }
+
+        /* Background floating petals/hearts canvas */
+        #petalsCanvas {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        main {
+          max-width: 1000px;
+          margin: auto;
+          padding: 20px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .panel {
+          background: rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(8px);
+          border: 1px solid #f3d5e0;
+          border-radius: 22px;
+          padding: 24px;
+          margin: 20px 0;
+          box-shadow: 0 8px 30px rgba(168, 80, 112, 0.12);
+          transition: all .3s ease;
+        }
+
+        .center { text-align: center; }
+
+        input, textarea {
+          display: block;
+          width: 100%;
+          margin: 8px 0 14px;
+          padding: 12px 14px;
+          border: 1px solid #edc6d5;
+          border-radius: 14px;
+          background: #fffdfd;
+          color: var(--dark);
+          font-size: 15px;
+          transition: border .2s;
+        }
+
+        input:focus, textarea:focus {
+          outline: none;
+          border-color: var(--rose);
+          box-shadow: 0 0 0 3px rgba(199, 91, 131, 0.15);
+        }
+
+        textarea {
+          min-height: 85px;
+          resize: vertical;
+        }
+
+        label {
+          font-weight: 600;
+          font-size: 14px;
+          color: #83435c;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Grid of dates */
+        #dates {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+          gap: 20px;
+          margin-top: 15px;
+        }
+
+        .date-card {
+          background: white;
+          border: 1px solid #f2cbd9;
+          padding: 24px 20px;
+          border-radius: 20px;
+          cursor: pointer;
+          text-align: center;
+          box-shadow: 0 6px 18px rgba(155, 73, 100, 0.1);
+          transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          animation: appear .5s ease both;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .date-card:hover {
+          transform: translateY(-6px) rotate(-0.5deg);
+          border-color: var(--rose);
+          box-shadow: 0 12px 28px rgba(199, 91, 131, 0.22);
+        }
+
+        .date-card h3 {
+          color: var(--rose);
+          font-size: 22px;
+          margin: 10px 0 6px;
+        }
+
+        .date-card .date {
+          font-size: 13px;
+          color: #a06c80;
+          font-weight: bold;
+          letter-spacing: 0.5px;
+        }
+
+        .date-card p {
+          font-size: 14px;
+          color: #8c596e;
+          line-height: 1.5;
+          margin-top: 10px;
+        }
+
+        @keyframes appear {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Polaroids */
+        #gallery {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          gap: 26px;
+          margin-top: 25px;
+        }
+
+        .polaroid {
+          padding: 12px 12px 20px;
+          background: white;
+          box-shadow: 0 8px 24px rgba(108, 49, 64, 0.14);
+          transform: rotate(-1.5deg);
+          animation: appear .5s ease both;
+          transition: transform .3s ease, box-shadow .3s ease;
+          position: relative;
+          border-radius: 4px;
+        }
+
+        .polaroid:nth-child(even) { transform: rotate(2deg); }
+        .polaroid:nth-child(3n) { transform: rotate(-1deg); }
+
+        .polaroid:hover {
+          transform: scale(1.04) rotate(0deg) !important;
+          box-shadow: 0 16px 32px rgba(199, 91, 131, 0.26);
+          z-index: 5;
+        }
+
+        .washi-tape {
+          position: absolute;
+          top: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 75px;
+          height: 20px;
+          background: rgba(248, 220, 231, 0.85);
+          border-left: 2px dashed rgba(199, 91, 131, 0.3);
+          border-right: 2px dashed rgba(199, 91, 131, 0.3);
+        }
+
+        .polaroid img {
+          width: 100%;
+          aspect-ratio: 1/1;
+          object-fit: cover;
+          cursor: pointer;
+          background: #f8e6ed;
+          border-radius: 2px;
+        }
+
+        .caption {
+          text-align: center;
+          padding: 12px 4px 4px;
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          font-family: 'Caveat', cursive, Georgia, serif;
+          font-size: 20px;
+          color: #5c2b3d;
+          line-height: 1.3;
+        }
+
+        .actions {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-top: 12px;
+        }
+
+        .actions button { padding: 8px 14px; font-size: 13px; }
+
+        /* Image Viewer Modal */
+        #viewer {
+          position: fixed;
+          inset: 0;
+          background: rgba(43, 20, 29, 0.88);
+          backdrop-filter: blur(5px);
+          z-index: 50;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+          cursor: pointer;
+        }
+
+        #viewer .viewer-inner {
+          max-width: 90%;
+          max-height: 85vh;
+          position: relative;
+          text-align: center;
+        }
+
+        #viewer img {
+          max-width: 100%;
+          max-height: 75vh;
+          object-fit: contain;
+          background: white;
+          padding: 12px 12px 35px 12px;
+          box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+          border-radius: 4px;
+        }
+
+        /* Custom Share Panel */
+        .share-box-highlight {
+          border: 2px solid #eab7ca;
+          background: #fff8fa;
+          box-shadow: 0 10px 30px rgba(199, 91, 131, 0.15);
+        }
+
+        .prefix-input-group {
+          display: flex;
+          align-items: center;
+          background: #fffdfd;
+          border: 1px solid #edc6d5;
+          border-radius: 14px;
+          margin: 8px 0 14px;
+          overflow: hidden;
+        }
+
+        .prefix-input-group span {
+          background: #fdf0f5;
+          color: #8c5369;
+          padding: 12px 14px;
+          font-size: 14px;
+          border-right: 1px solid #edc6d5;
+          user-select: none;
+          white-space: nowrap;
+        }
+
+        .prefix-input-group input {
+          border: none;
+          margin: 0;
+          background: transparent;
+          border-radius: 0;
+        }
+        .prefix-input-group input:focus {
+          box-shadow: none;
+        }
+
+        /* Floating Toast Message */
+        #toast {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          background: #ffffff;
+          color: var(--dark);
+          border: 1px solid #f3cbd9;
+          padding: 12px 20px;
+          border-radius: 30px;
+          box-shadow: 0 10px 25px rgba(199, 91, 131, 0.25);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          z-index: 100;
+          font-size: 14px;
+          font-weight: 500;
+          opacity: 0;
+          transform: translateY(20px);
+          pointer-events: none;
+          transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #toast.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        footer {
+          text-align: center;
+          padding: 40px 15px 30px;
+          color: #a06c80;
+          font-size: 14px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .small {
+          font-size: 13px;
+          color: #976b7c;
+          line-height: 1.6;
+        }
+
+        hr {
+          border: 0;
+          border-top: 1px dashed #eed0dc;
+          margin: 22px 0;
+        }
+
+        @media(max-width: 600px) {
+          main { padding: 12px; }
+          .panel { padding: 18px; }
+          .prefix-input-group { flex-direction: column; align-items: stretch; }
+          .prefix-input-group span { border-right: none; border-bottom: 1px solid #edc6d5; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Background Canvas for Floating Hearts & Petals -->
+<canvas id="petalsCanvas"></canvas>
+
+<!-- Notification Toast -->
+<div id="toast">
+    <span id="toastIcon">♥</span>
+    <span id="toastMessage">Done!</span>
+</div>
+
+<header>
+    <div class="heart" style="font-size:36px">♥</div>
+    <h1 id="siteTitle">Little Moments</h1>
+    <p id="subtitle">Every date, a memory. Every memory, a piece of my heart.</p>
+
+    <div class="actions" style="justify-content:center; margin-top: 16px;">
+        <button id="editToggle" onclick="toggleEditor()">✎ Edit Our Story</button>
+        <button id="openShareBtn" class="secondary" onclick="toggleSharePanel()">♡ Share Link</button>
+    </div>
+
+    <!-- DEDICATED CUSTOM & SHORT LINK PANEL -->
+    <section id="shareLinkPanel" class="panel share-box-highlight hidden" style="max-width:700px;margin:22px auto 0;text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; color:var(--rose);">♡ Create Your Sharable Love Link</h3>
+            <button class="secondary" style="padding:4px 10px; font-size:12px; border-radius:50%;" onclick="toggleSharePanel()">✕</button>
+        </div>
+
+        <p class="small" style="margin-top: 6px;">
+            Apna custom short link banao jisme aapka naam ya message ho, ya seedha WhatsApp par share karo!
+        </p>
+
+        <!-- Custom Alias Setting -->
+        <label for="customAliasInput">1. Custom Link Name (Aapka Pasandeeda Naam):</label>
+        <div class="prefix-input-group">
+            <span>tinyurl.com/</span>
+            <input type="text" id="customAliasInput" placeholder="e.g. rohit-priya-love, our-first-year" oninput="sanitizeAlias(this)">
+        </div>
+        <p class="small" style="margin-top:-8px; margin-bottom:14px; font-size:11.5px;">
+            * Sirf letters, numbers aur hyphens (-) daalein. Agar ye naam pehle se kisi ka hua toh automatic short link ban jayega.
+        </p>
+
+        <div class="actions" style="margin-bottom: 14px;">
+            <button type="button" id="btnGenShort" onclick="generateCustomShortLink()">
+                ✨ Generate Custom Short Link
+            </button>
+            <button type="button" class="secondary" onclick="generateInstantDirectLink()">
+                ⚡ Quick Direct Link
+            </button>
+        </div>
+
+        <!-- Generated Link Output Box -->
+        <label for="generatedShareLink">2. Aapka Ready Sharable Link:</label>
+        <div class="actions" style="display:flex; gap:8px; align-items:center; margin-top:6px;">
+            <input
+                    id="generatedShareLink"
+                    type="text"
+                    readonly
+                    placeholder="Link yahan dikhega..."
+                    style="flex:1; min-width:180px; margin:0; background:white; font-weight:bold; color:var(--rose);">
+
+            <button type="button" onclick="copyCustomShareLink()">
+                📋 Copy Link
+            </button>
+            <button type="button" class="whatsapp-btn" onclick="shareOnWhatsApp()">
+                💬 WhatsApp
+            </button>
+        </div>
+
+        <p id="shareStatusHint" class="small" style="margin-top:10px; color:#c75b83;"></p>
+    </section>
+</header>
+
+<main>
+    <!-- MAIN EDITOR PANEL -->
+    <section id="editor" class="panel hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0; color:var(--rose);">♡ Your Love Story Editor</h2>
+            <button class="secondary" style="padding:4px 10px; font-size:12px;" onclick="toggleEditor()">Close ✕</button>
+        </div>
+        <p class="small">
+            Sabhi changes aapke browser mein automatically save hote hain. Apne partner ko bhejne ke liye "Share Link" use karein.
+        </p>
+
+        <label>Website Title</label>
+        <input id="titleInput" placeholder="e.g. Little Moments, Our Love Story">
+
+        <label>Opening Message / Quote</label>
+        <textarea id="subtitleInput" placeholder="A little world made just for you..."></textarea>
+
+        <label>Spotify Song, Album or Playlist Link</label>
+        <input id="spotifyInput" placeholder="https://open.spotify.com/track/... ya koi bhi playlist">
+
+        <!-- Quick song suggestion chips -->
+        <div style="margin-top:-6px; margin-bottom:14px;">
+            <span class="small" style="font-weight:bold;">Quick Pick Romantic Songs:</span>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+                <button type="button" class="secondary" style="padding:4px 10px; font-size:11px;" onclick="setPresetSong('https://open.spotify.com/track/0T5iIrXA4p5Gsubkh6z0Ud', 'Until I Found You')">Until I Found You</button>
+                <button type="button" class="secondary" style="padding:4px 10px; font-size:11px;" onclick="setPresetSong('https://open.spotify.com/track/6Vsv3999qvuZZioLhaApXt', 'Kesariya')">Kesariya</button>
+                <button type="button" class="secondary" style="padding:4px 10px; font-size:11px;" onclick="setPresetSong('https://open.spotify.com/track/0bYg9bo50gSsH3LtW2Wqo6', 'Perfect - Ed Sheeran')">Perfect</button>
+                <button type="button" class="secondary" style="padding:4px 10px; font-size:11px;" onclick="setPresetSong('https://open.spotify.com/track/5PUXKVAsQ69t2wY961p99k', 'Raataan Lambiyan')">Raataan Lambiyan</button>
+            </div>
+        </div>
+
+        <button onclick="saveSettings()">💾 Save Website Details</button>
+
+        <hr>
+
+        <h3 style="color:var(--rose); margin-top:0;">+ Add a Special Date / Milestone</h3>
+
+        <label>Calendar Date</label>
+        <input type="date" id="newDate">
+
+        <label>Occasion Title</label>
+        <input id="newTitle" placeholder="e.g. The First Day We Met, Romantic Dinner">
+
+        <label>Romantic Memory Note</label>
+        <textarea id="newMessage" placeholder="What made this day unforgettable for both of us?..."></textarea>
+
+        <button onclick="addDate()">+ Add This Special Date</button>
+
+        <hr>
+
+        <h3 style="color:var(--rose);">Manage Your Milestones & Dates</h3>
+        <div id="dateEditor"></div>
+
+        <hr>
+
+        <div class="actions">
+            <button class="secondary" onclick="exportHTML()">📥 Download Full HTML Backup</button>
+            <button class="secondary" onclick="resetToDefaults()">↺ Reset to Sample Story</button>
+        </div>
+
+        <p id="editorStatus" class="small"></p>
+    </section>
+
+    <!-- WELCOME INTRO (When looking at dates list) -->
+    <section id="welcome" class="panel center">
+        <h2>To my favourite person <span class="heart">♥</span></h2>
+        <p id="welcomeText">Some moments deserve their own little place in the universe.</p>
+        <p class="small">Choose a date below and let's relive it together.</p>
+    </section>
+
+    <!-- ACTIVE DATE / POLAROID SCREEN -->
+    <section id="dateScreen" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <button class="secondary" onclick="goBack()">← Back to Our Dates</button>
+            <button class="secondary" onclick="toggleSharePanel()">♡ Share This Story</button>
+        </div>
+
+        <div class="panel center" style="position:relative;">
+            <div class="heart" style="font-size:28px">♥</div>
+            <h2 id="memoryTitle" style="color:var(--rose); margin: 6px 0;"></h2>
+            <p id="memoryDate" style="color:#a06c80; font-weight:bold; font-size:14px; margin:0 0 10px;"></p>
+            <p id="memoryMessage" style="white-space:pre-wrap; font-style:italic; font-size:16px; max-width:700px; margin:auto;"></p>
+        </div>
+
+        <!-- Polaroids Grid -->
+        <div id="gallery"></div>
+
+        <!-- Spotify Player for this date / story -->
+        <div id="songPanel" class="panel hidden">
+            <h3 class="center" style="margin:0 0 12px; color:var(--rose);">Our Dedicated Melody ♡</h3>
+            <div id="spotifyEmbed"></div>
+            <p class="center" style="margin: 8px 0 0;">
+                <a id="spotifyLink" target="_blank" rel="noopener" style="color:var(--rose); text-decoration:underline; font-size:14px;">Open in Spotify App ♫</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- HOME TIMELINE DATES -->
+    <section id="homeDates">
+        <h2 class="center" style="color:var(--rose); font-style:italic;">Our Memory Lane ♡</h2>
+        <div id="dates"></div>
+    </section>
+
+    <!-- POLAROID UPLOADER (Shown when inside a date and in editor mode) -->
+    <section id="photoEditor" class="panel hidden">
+        <h3 style="color:var(--rose); margin-top:0;">📸 Pin a New Polaroid Picture</h3>
+
+        <label>1. Select Photo from Phone or Laptop</label>
+        <input type="file" id="photoFile" accept="image/*">
+
+        <label>2. Handwritten Caption for this Polaroid</label>
+        <textarea id="photoCaption" placeholder="e.g. That bright smile when I saw you... ✨"></textarea>
+
+        <button onclick="addPhoto()">📸 Pin to Polaroid Scrapbook</button>
+    </section>
+
+    <section id="emptyHint" class="panel center hidden">
+        <p>Our story is waiting for its first memory. Click "Edit Our Story" above to begin! ♡</p>
+    </section>
+</main>
+
+<!-- POLAROID EXPANDED LIGHTBOX VIEWER -->
+<div id="viewer" class="hidden" onclick="closeViewer()">
+    <div class="viewer-inner" onclick="event.stopPropagation()">
+        <img id="viewerImage" alt="Memory Photo">
+        <p id="viewerCaption" style="color:white; font-size:18px; margin-top:12px; font-family:'Georgia', serif; font-style:italic;"></p>
+        <button class="secondary" style="margin-top:10px;" onclick="closeViewer()">Close ✕</button>
+    </div>
+</div>
+
+<footer>
+    Made with all my heart ♥ Just for you.
+</footer>
+
+<script>
+    const STORAGE_KEY = "littleMomentsLoveStory_v2";
+
+    function freshStory() {
+      return {
+        title: "Little Moments",
+        subtitle: "Every date, a memory. Every memory, a piece of my heart.",
+        spotify: "https://open.spotify.com/track/0T5iIrXA4p5Gsubkh6z0Ud", // Stephen Sanchez - Until I Found You
+        dates: [
+          {
+            id: "first-date-coffee",
+            date: "2023-09-18",
+            title: "The Coffee Shop We First Spoke",
+            message: "A rainy Sunday afternoon, warm hazelnut lattes, and a four-hour conversation that felt like five minutes. ♡",
+            photos: [
+              {
+                src: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=700&q=80",
+                caption: "Our first coffee together ☕️"
+              },
+              {
+                src: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=700&q=80",
+                caption: "Rain tapping on the window glass ✨"
+              }
+            ]
+          },
+          {
+            id: "midnight-stargazing",
+            date: "2024-03-22",
+            title: "Midnight Stargazing Under the Sky",
+            message: "Sitting on the car hood, listening to our favorite playlist, watching the stars shine softly.",
+            photos: [
+              {
+                src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=80",
+                caption: "Under a million stars with you ✨"
+              }
+            ]
+          }
+        ]
+      };
+    }
+
+    // Check if we are in shared preview mode
+    const isSharedPreview = location.hash.startsWith("#story=") || location.search.includes("mode=view");
+
+    function loadStory() {
+      const hash = location.hash;
+
+      if (hash.startsWith("#story=")) {
+        try {
+          const raw = hash.slice(7);
+          // Try LZString decompression first
+          let decompressed = LZString.decompressFromEncodedURIComponent(raw);
+          if (!decompressed) {
+            // Fallback to Base64
+            decompressed = decodeURIComponent(escape(atob(
+              raw.replace(/-/g, "+").replace(/_/g, "/")
+            )));
+          }
+
+          const parsed = JSON.parse(decompressed);
+          if (parsed && Array.isArray(parsed.dates)) {
+            return parsed;
+          }
+        } catch (e) {
+          console.warn("Could not read shared story hash.", e);
+        }
+      }
+
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+
+      return freshStory();
+    }
+
+    let story = loadStory();
+    let activeId = null;
+
+    function saveLocal() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(story));
+      } catch (e) {
+        showToast("⚠️ Storage full! Please use compressed photos.", true);
+      }
+    }
+
+    // ------------------------------------------
+    // UI & PANELS CONTROLS
+    // ------------------------------------------
+    function toggleEditor() {
+      if (isSharedPreview) return;
+      const editor = document.getElementById("editor");
+      editor.classList.toggle("hidden");
+
+      if (!editor.classList.contains("hidden")) {
+        populateEditor();
+        editor.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    function toggleSharePanel() {
+      const panel = document.getElementById("shareLinkPanel");
+      panel.classList.toggle("hidden");
+
+      if (!panel.classList.contains("hidden")) {
+        panel.scrollIntoView({ behavior: "smooth" });
+        // Pre-populate short link if empty
+        if (!document.getElementById("generatedShareLink").value) {
+          generateInstantDirectLink();
+        }
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById("toast");
+      const msgEl = document.getElementById("toastMessage");
+      const icon = document.getElementById("toastIcon");
+
+      icon.textContent = isError ? "⚠️" : "♥";
+      msgEl.textContent = msg;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3200);
+    }
+
+    function setPresetSong(url, name) {
+      document.getElementById("spotifyInput").value = url;
+      showToast(`Selected: ${name} ♫`);
+    }
+
+    function sanitizeAlias(input) {
+      input.value = input.value.toLowerCase().replace(/[^a-z0-9-_]/g, "");
+    }
+
+    // ------------------------------------------
+    // CUSTOM SHORT LINK GENERATION
+    // ------------------------------------------
+    function getBaseStoryUrl() {
+      const json = JSON.stringify(story);
+      // Compress story using LZString for compact URL
+      const compressed = LZString.compressToEncodedURIComponent(json);
+      const base = location.origin + location.pathname;
+      return `${base}?mode=view#story=${compressed}`;
+    }
+
+    // 1. Generate Custom Short Link with TinyURL / is.gd Alias
+    async function generateCustomShortLink() {
+      const customAlias = document.getElementById("customAliasInput").value.trim();
+      const btn = document.getElementById("btnGenShort");
+      const output = document.getElementById("generatedShareLink");
+      const statusHint = document.getElementById("shareStatusHint");
+
+      btn.disabled = true;
+      btn.innerHTML = `⏳ Creating link...`;
+      statusHint.textContent = "Connecting to short link service...";
+
+      const targetUrl = getBaseStoryUrl();
+
+      try {
+        let apiEndpoint = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
+        if (customAlias) {
+          apiEndpoint += `&alias=${encodeURIComponent(customAlias)}`;
+        }
+
+        const response = await fetch(apiEndpoint);
+        if (!response.ok) throw new Error("Alias already taken or network error");
+
+        const shortUrl = await response.text();
+
+        if (shortUrl && shortUrl.startsWith("http")) {
+          output.value = shortUrl.trim();
+          statusHint.textContent = customAlias ? `✅ Custom link created: ${shortUrl}` : `✅ Short link created: ${shortUrl}`;
+          showToast("Link Created! Now copy or send on WhatsApp ♥");
+        } else {
+          throw new Error("Invalid response");
+        }
+      } catch (err) {
+        // If alias fails or CORS fails, try is.gd JSONP fallback
+        fallbackIsGdShortener(targetUrl, customAlias);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `✨ Generate Custom Short Link`;
+      }
+    }
+
+    // Fallback JSONP for is.gd
+    function fallbackIsGdShortener(targetUrl, customAlias) {
+      const callbackName = "cb_isgd_" + Date.now();
+      const script = document.createElement("script");
+      const output = document.getElementById("generatedShareLink");
+      const statusHint = document.getElementById("shareStatusHint");
+
+      let url = `https://is.gd/create.php?format=json&callback=${callbackName}&url=${encodeURIComponent(targetUrl)}`;
+      if (customAlias) {
+        url += `&shorturl=${encodeURIComponent(customAlias)}`;
+      }
+
+      window[callbackName] = function(result) {
+        script.remove();
+        delete window[callbackName];
+
+        if (result && result.shorturl) {
+          output.value = result.shorturl;
+          statusHint.textContent = `✅ Short link created: ${result.shorturl}`;
+          showToast("Short link created! ♥");
+        } else {
+          // Direct Clean link fallback
+          generateInstantDirectLink();
+          statusHint.textContent = "Alias liya ja chuka tha ya service busy thi, isliye direct quick link de diya gaya hai.";
+        }
+      };
+
+      script.onerror = () => {
+        script.remove();
+        delete window[callbackName];
+        generateInstantDirectLink();
+        statusHint.textContent = "Quick link ready! (Direct shareable URL)";
+      };
+
+      document.body.appendChild(script);
+    }
+
+    // 2. Generate Instant Direct Link (Always works offline & everywhere)
+    function generateInstantDirectLink() {
+      const output = document.getElementById("generatedShareLink");
+      const statusHint = document.getElementById("shareStatusHint");
+
+      output.value = getBaseStoryUrl();
+      statusHint.textContent = "⚡ Quick Direct Link ready! (Full offline & instant support)";
+      showToast("Quick Link Ready ♥");
+    }
+
+    // 3. Copy Link to Clipboard
+    async function copyCustomShareLink() {
+      const field = document.getElementById("generatedShareLink");
+      if (!field.value) {
+        generateInstantDirectLink();
+      }
+
+      field.focus();
+      field.select();
+      field.setSelectionRange(0, field.value.length);
+
+      try {
+        document.execCommand("copy");
+        showToast("Link copied to clipboard! 📋");
+      } catch (e) {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(field.value);
+          showToast("Link copied to clipboard! 📋");
+        } else {
+          prompt("Copy this link:", field.value);
+        }
+      }
+    }
+
+    // 4. One-Click WhatsApp Share
+    function shareOnWhatsApp() {
+      const field = document.getElementById("generatedShareLink");
+      if (!field.value) {
+        generateInstantDirectLink();
+      }
+      const link = field.value;
+      const message = encodeURIComponent(`Hey, I made something special for you with all my heart ♡ Relive our memories here: ${link}`);
+      window.open(`https://api.whatsapp.com/send?text=${message}`, "_blank");
+    }
+
+    // ------------------------------------------
+    // SETTINGS & EDITOR LOGIC
+    // ------------------------------------------
+    function saveSettings() {
+      story.title = document.getElementById("titleInput").value.trim() || "Little Moments";
+      story.subtitle = document.getElementById("subtitleInput").value;
+      story.spotify = document.getElementById("spotifyInput").value.trim();
+
+      saveLocal();
+      render();
+      populateEditor();
+      showToast("Website details saved! ♥");
+    }
+
+    function populateEditor() {
+      document.getElementById("titleInput").value = story.title || "";
+      document.getElementById("subtitleInput").value = story.subtitle || "";
+      document.getElementById("spotifyInput").value = story.spotify || "";
+
+      const container = document.getElementById("dateEditor");
+      container.replaceChildren();
+
+      story.dates.forEach(item => {
+        const box = document.createElement("div");
+        box.className = "panel";
+        box.style.background = "#ffffff";
+        box.style.padding = "16px";
+        box.style.marginBottom = "14px";
+
+        const date = document.createElement("input");
+        date.type = "date";
+        date.value = item.date || "";
+
+        const title = document.createElement("input");
+        title.placeholder = "Memory Title";
+        title.value = item.title || "";
+
+        const message = document.createElement("textarea");
+        message.placeholder = "Romantic Note / Message";
+        message.value = item.message || "";
+
+        const save = document.createElement("button");
+        save.textContent = "Save Changes";
+        save.onclick = () => {
+          item.date = date.value;
+          item.title = title.value;
+          item.message = message.value;
+          saveLocal();
+          render();
+          populateEditor();
+          showToast("Date saved! ♥");
+        };
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete Date";
+        deleteButton.className = "secondary";
+        deleteButton.onclick = () => {
+          if (!confirm("Are you sure you want to delete this date and all its polaroids?")) return;
+          story.dates = story.dates.filter(d => d.id !== item.id);
+          if (activeId === item.id) activeId = null;
+          saveLocal();
+          render();
+          populateEditor();
+          showToast("Date removed.");
+        };
+
+        const photoTitle = document.createElement("p");
+        photoTitle.textContent = `Polaroid Photos in this date (${(item.photos || []).length}):`;
+        photoTitle.style.fontWeight = "bold";
+        photoTitle.style.margin = "12px 0 6px";
+
+        box.append(date, title, message, save, deleteButton, photoTitle);
+
+        (item.photos || []).forEach((photo, index) => {
+          const caption = document.createElement("textarea");
+          caption.placeholder = "Polaroid Caption";
+          caption.value = photo.caption || "";
+          caption.style.minHeight = "60px";
+
+          const row = document.createElement("div");
+          row.className = "actions";
+
+          const saveCaption = document.createElement("button");
+          saveCaption.textContent = "Save Caption";
+          saveCaption.onclick = () => {
+            photo.caption = caption.value;
+            saveLocal();
+            render();
+            showToast("Caption updated! ♥");
+          };
+
+          const removePhoto = document.createElement("button");
+          removePhoto.textContent = "Remove Polaroid";
+          removePhoto.className = "secondary";
+          removePhoto.onclick = () => {
+            item.photos.splice(index, 1);
+            saveLocal();
+            render();
+            populateEditor();
+            showToast("Photo removed.");
+          };
+
+          row.append(saveCaption, removePhoto);
+          box.append(caption, row);
+        });
+
+        container.append(box);
+      });
+    }
+
+    function addDate() {
+      const date = document.getElementById("newDate").value;
+      const title = document.getElementById("newTitle").value.trim();
+      const message = document.getElementById("newMessage").value.trim();
+
+      if (!title) {
+        showToast("Please give your memory an occasion title first ♡", true);
+        return;
+      }
+
+      story.dates.push({
+        id: "date-" + Date.now(),
+        date,
+        title,
+        message,
+        photos: []
+      });
+
+      document.getElementById("newDate").value = "";
+      document.getElementById("newTitle").value = "";
+      document.getElementById("newMessage").value = "";
+
+      saveLocal();
+      render();
+      populateEditor();
+      showToast("Special date added! ♥");
+    }
+
+    function addPhoto() {
+      const item = story.dates.find(d => d.id === activeId);
+      const fileInput = document.getElementById("photoFile");
+      const file = fileInput.files[0];
+
+      if (!item) {
+        showToast("Please open a date first.", true);
+        return;
+      }
+
+      if (!file) {
+        showToast("Please select a photo first.", true);
+        return;
+      }
+
+      const image = new Image();
+      const reader = new FileReader();
+
+      reader.onload = event => {
+        image.onload = () => {
+          // Compress and scale photo for smooth storage & fast link sharing
+          const maxSize = 800;
+          const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(image.width * scale);
+          canvas.height = Math.round(image.height * scale);
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+          item.photos.push({
+            src: canvas.toDataURL("image/jpeg", 0.75),
+            caption: document.getElementById("photoCaption").value.trim()
+          });
+
+          saveLocal();
+          render();
+
+          document.getElementById("photoFile").value = "";
+          document.getElementById("photoCaption").value = "";
+          showToast("Polaroid pinned to scrapbook! 📸");
+        };
+        image.src = event.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // ------------------------------------------
+    // DATE NAVIGATION & SPOTIFY PLAYER
+    // ------------------------------------------
+    function openDate(id) {
+      activeId = id;
+      const item = story.dates.find(d => d.id === id);
+      if (!item) return;
+
+      document.getElementById("welcome").classList.add("hidden");
+      document.getElementById("homeDates").classList.add("hidden");
+      document.getElementById("dateScreen").classList.remove("hidden");
+
+      document.getElementById("photoEditor").classList.toggle(
+        "hidden",
+        isSharedPreview
+      );
+
+      document.getElementById("memoryTitle").textContent = item.title;
+      document.getElementById("memoryDate").textContent = item.date || "";
+      document.getElementById("memoryMessage").textContent = item.message || "";
+
+      const gallery = document.getElementById("gallery");
+      gallery.replaceChildren();
+
+      if (!item.photos || item.photos.length === 0) {
+        const emptyHint = document.createElement("p");
+        emptyHint.className = "center small";
+        emptyHint.style.gridColumn = "1/-1";
+        emptyHint.textContent = "No polaroid photos added yet for this date. Click 'Add Polaroid' below to pin one!";
+        gallery.append(emptyHint);
+      } else {
+        item.photos.forEach(photo => {
+          const polaroid = document.createElement("div");
+          polaroid.className = "polaroid";
+
+          const washi = document.createElement("div");
+          washi.className = "washi-tape";
+
+          const img = document.createElement("img");
+          img.src = photo.src;
+          img.alt = photo.caption || "Our memory";
+
+          img.onclick = () => {
+            document.getElementById("viewerImage").src = photo.src;
+            document.getElementById("viewerCaption").textContent = photo.caption || "";
+            document.getElementById("viewer").classList.remove("hidden");
+          };
+
+          const caption = document.createElement("div");
+          caption.className = "caption";
+          caption.textContent = photo.caption || "";
+
+          polaroid.append(washi, img, caption);
+          gallery.append(polaroid);
+        });
+      }
+
+      renderSpotify();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goBack() {
+      activeId = null;
+      document.getElementById("dateScreen").classList.add("hidden");
+      document.getElementById("photoEditor").classList.add("hidden");
+      document.getElementById("welcome").classList.remove("hidden");
+      document.getElementById("homeDates").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeViewer() {
+      document.getElementById("viewer").classList.add("hidden");
+    }
+
+    function renderSpotify() {
+      const panel = document.getElementById("songPanel");
+      const embed = document.getElementById("spotifyEmbed");
+      const link = document.getElementById("spotifyLink");
+
+      embed.replaceChildren();
+      const url = story.spotify || "";
+
+      const valid = /^https:\/\/open\.spotify\.com\/(track|album|playlist|episode|show)\/[A-Za-z0-9]+/i.test(url);
+      panel.classList.toggle("hidden", !valid);
+
+      if (!valid) return;
+      link.href = url;
+
+      // Convert to embed player
+      let embedUrl = url;
+      if (!embedUrl.includes("/embed/")) {
+        const matches = url.match(/(track|album|playlist|artist)\/([a-zA-Z0-9]+)/);
+        if (matches && matches[1] && matches[2]) {
+          embedUrl = `https://open.spotify.com/embed/${matches[1]}/${matches[2]}?utm_source=generator&theme=0`;
+        }
+      }
+
+      const iframe = document.createElement("iframe");
+      iframe.src = embedUrl;
+      iframe.width = "100%";
+      iframe.height = "152";
+      iframe.style.border = "0";
+      iframe.style.borderRadius = "14px";
+      iframe.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+      iframe.loading = "lazy";
+      iframe.title = "Our Spotify dedication";
+
+      embed.append(iframe);
+    }
+
+    function render() {
+      document.title = story.title || "Little Moments ♡";
+      document.getElementById("siteTitle").textContent = story.title || "Little Moments";
+      document.getElementById("subtitle").textContent = story.subtitle || "";
+      document.getElementById("welcomeText").textContent = story.subtitle || "";
+
+      const dates = document.getElementById("dates");
+      dates.replaceChildren();
+
+      document.getElementById("emptyHint").classList.toggle(
+        "hidden",
+        story.dates && story.dates.length > 0
+      );
+
+      (story.dates || []).forEach(item => {
+        const card = document.createElement("div");
+        card.className = "date-card";
+        card.onclick = () => openDate(item.id);
+
+        const icon = document.createElement("div");
+        icon.className = "heart";
+        icon.textContent = "♥";
+
+        const title = document.createElement("h3");
+        title.textContent = item.title;
+
+        const date = document.createElement("div");
+        date.className = "date";
+        date.textContent = item.date || "A cherished moment";
+
+        const message = document.createElement("p");
+        const preview = item.message || "";
+        message.textContent = preview.length > 90 ? preview.slice(0, 90) + "…" : preview;
+
+        card.append(icon, title, date, message);
+        dates.append(card);
+      });
+
+      if (!isSharedPreview) {
+        document.getElementById("editToggle").classList.remove("hidden");
+      } else {
+        document.getElementById("editToggle").classList.add("hidden");
+        document.getElementById("editor").classList.add("hidden");
+        document.getElementById("photoEditor").classList.add("hidden");
+      }
+
+      if (activeId) openDate(activeId);
+    }
+
+    function exportHTML() {
+      const clone = document.documentElement.cloneNode(true);
+      const script = clone.querySelector("script");
+
+      clone.querySelector("#editor")?.classList.add("hidden");
+      clone.querySelector("#photoEditor")?.classList.add("hidden");
+      clone.querySelector("#shareLinkPanel")?.classList.add("hidden");
+
+      const state = document.createElement("script");
+      state.textContent = "window.__EXPORTED_STORY__ = " + JSON.stringify(story).replace(/</g, "\\u003c") + ";";
+      script.before(state);
+
+      const blob = new Blob(["<!DOCTYPE html>\n" + clone.outerHTML], { type: "text/html;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "our-love-story.html";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast("HTML Backup downloaded! 💌");
+    }
+
+    function resetToDefaults() {
+      if (confirm("Reset everything to sample memories?")) {
+        story = freshStory();
+        saveLocal();
+        render();
+        populateEditor();
+        showToast("Reset to sample memories.");
+      }
+    }
+
+    // ------------------------------------------
+    // FLOATING PETALS & HEARTS CANVAS
+    // ------------------------------------------
+    function initFloatingCanvas() {
+      const canvas = document.getElementById("petalsCanvas");
+      const ctx = canvas.getContext("2d");
+      let w = (canvas.width = window.innerWidth);
+      let h = (canvas.height = window.innerHeight);
+
+      window.addEventListener("resize", () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const items = Array.from({ length: 24 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        size: Math.random() * 8 + 6,
+        speedY: Math.random() * 0.7 + 0.3,
+        speedX: Math.random() * 0.5 - 0.25,
+        isHeart: Math.random() > 0.5,
+        opacity: Math.random() * 0.35 + 0.15,
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 1.2
+      }));
+
+      function loop() {
+        ctx.clearRect(0, 0, w, h);
+
+        items.forEach(p => {
+          p.y += p.speedY;
+          p.x += Math.sin(p.y * 0.01) * 0.4 + p.speedX;
+          p.rot += p.rotSpeed;
+
+          if (p.y > h + 20) {
+            p.y = -20;
+            p.x = Math.random() * w;
+          }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.globalAlpha = p.opacity;
+
+          if (p.isHeart) {
+            ctx.fillStyle = "#e77c9f";
+            const s = p.size * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(0, s / 4);
+            ctx.quadraticCurveTo(0, -s, -s, -s);
+            ctx.quadraticCurveTo(-2 * s, -s, -2 * s, s / 2);
+            ctx.quadraticCurveTo(-2 * s, s * 1.5, 0, s * 2.5);
+            ctx.quadraticCurveTo(2 * s, s * 1.5, 2 * s, s / 2);
+            ctx.quadraticCurveTo(2 * s, -s, s, -s);
+            ctx.quadraticCurveTo(0, -s, 0, s / 4);
+            ctx.fill();
+          } else {
+            ctx.fillStyle = "#f8dce7";
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.size, p.size * 0.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        });
+
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+
+    // ------------------------------------------
+    // INITIALIZE APP
+    // ------------------------------------------
+    if (window.__EXPORTED_STORY__) {
+      story = window.__EXPORTED_STORY__;
+    }
+
+    initFloatingCanvas();
+    render();
+</script>
+</body>
+</html>
